@@ -291,7 +291,7 @@ class Preparer(object):
         return True
         
     def prepare_backup_innobackupex(self, prepare_dir, incremental_dir, log_file):
-        cmd = [Preparer.INNOBACKUPEX_CMD, "--use-memory=2G", "--apply-log", "--redo-only"]
+        cmd = [Preparer.INNOBACKUPEX_CMD, "--apply-log", "--redo-only"]
         if incremental_dir is not None:
             cmd.append("--incremental-dir")
             cmd.append(incremental_dir)

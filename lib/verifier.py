@@ -82,7 +82,7 @@ class Verifier(object):
         return self._verify_directory
 
     def apply_log(self, log_file):
-        cmd = [Verifier.INNOBACKUPEX_CMD, "--use-memory=2G", "--apply-log", self._verify_directory]
+        cmd = [Verifier.INNOBACKUPEX_CMD, "--apply-log", self._verify_directory]
 
         self._log_helper.info_message("Executing command %s" % ' '.join(cmd))
 
@@ -118,7 +118,6 @@ class Verifier(object):
                 "--pid=%s" % self._pid_file, 
                 "--socket=%s" % self._socket_file,
                 "--datadir=%s" % self._verify_directory,
-		"--innodb_buffer_pool_size=2G",
                 "--log-slow-queries=0",
                 "--skip-slave-start",
                 "--log=0",
