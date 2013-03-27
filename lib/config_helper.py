@@ -20,7 +20,7 @@ import os
 import os.path
 
 class Config_helper(object):
-    CONFIG_PATH = os.path.realpath(os.getcwd() + '/..')
+    CONFIG_PATH = '/usr/local/xb-mgr/conf/backup.conf'
 
     @staticmethod
     def get_hosts_to_backup():

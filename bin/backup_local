@@ -7,9 +7,9 @@ remote_backup_directory=
 last_lsn=
 
 mysql_user="root"
-mysql_password="pass"
+mysql_password=""
 
-root_dir=$(cd ..; pwd)
+root_dir=$(cd $(dirname $0)/..; pwd)
 tmp_dir="${root_dir}/tmp"
 backup_log="${tmp_dir}/backup-$(date +%Y_%m_%d).log"
 backup_cmd="/usr/bin/innobackupex"
