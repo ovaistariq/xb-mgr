@@ -9,7 +9,7 @@ last_lsn=
 mysql_user="root"
 mysql_password="pass"
 
-root_dir="/usr/local/backup_manager"
+root_dir=$(cd ..; pwd)
 tmp_dir="${root_dir}/tmp"
 backup_log="${tmp_dir}/backup-$(date +%Y_%m_%d).log"
 backup_cmd="/usr/bin/innobackupex"

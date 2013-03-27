@@ -16,9 +16,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import ConfigParser
+import os
+import os.path
 
 class Config_helper(object):
-    CONFIG_PATH = "/usr/local/backup_manager/conf/backup.conf"
+    CONFIG_PATH = os.path.realpath(os.getcwd() + '/..')
 
     @staticmethod
     def get_hosts_to_backup():

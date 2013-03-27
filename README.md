@@ -3,8 +3,8 @@ XtraBackup Backup Manager
 
 XtraBackup Backup Manager (xb-mgr) is a backup manager for backing up MySQL data. It uses Percona XtraBackup tool (http://www.percona.com/doc/percona-xtrabackup/intro.html) to backup a MySQL instance. xb-mgr is fairly simple to use and configure. It supports ini style configuration files that can be used to configure backups for remote MySQL instances. xb-mgr supports full backups as well as incremental backups, and is designed to work in the following way. The user specifies which day of the week full backup should be taken, suppose that is Sunday, then every Sunday a full backup is taken once, and every other day incremental backups are taken. xb-mgr also supports multiple backups per day. For example you can setup xb-mgr to run every 8 hour each day via CRON. Note that on the day when full backup is taken, even if you run xb-mgr multiple times, it will still take only a single full backup on that day, and remaining backups will be incremental. xb-mgr also keeps a compressed copy of a fully prepared backup available to make the process of restoring from backups efficient. xb-mgr supports keeping multiple copies of prepared and compressed backups available. This is configurable, for example you can configure to only have 1 prepared backup available, and the latest prepared backup will always be available. xb-mgr also supports logging to a log file as well as sending an email with the log of the backup run to a specified email address.
 
-Running xb-mgr is as simple as executing a single script. Suppose xb-mgr is installed at /usr/local/backup-manager, then you can run xb-mgr as follows:
-/usr/local/backup-manager/backup_manager.py
+Running xb-mgr is as simple as executing a single script. Suppose xb-mgr is installed at /usr/local/xb-mgr, then you can run xb-mgr as follows:
+/usr/local/xb-mgr/backup_manager.py
 
 Package Requirements and Dependencies
 =====================================
@@ -70,19 +70,19 @@ mysql_user          = backup_man
 mysql_password      = some_pass
 ssh_user            = root
 backup_manager_host = root@10.10.1.1
-remote_backup_cmd   = /usr/local/backup_manager/bin/backup_local
+remote_backup_cmd   = /usr/local/xb-mgr/bin/backup_local
 full_backup_day     = Sunday
-root_dir            = /usr/local/backup_manager
+root_dir            = /usr/local/xb-mgr
 backup_dir          = /backup
-log                 = /var/log/backup_manager/backup_manager.log
-pid                 = /var/run/backup_manager.pid
+log                 = /var/log/xb-mgr/backup_manager.log
+pid                 = /var/run/xb-mgr.pid
 retain_days         = 7
 retain_num_ready_backups = 1
 error_email_recipient = ovaistariq@gmail.com
 
 [db1]
 hostname    = db1
-log         = /var/log/backup_manager/db1.log
+log         = /var/log/xb-mgr/db1.log
 --
 
 Note that we have two sections above, one is the default section which consists of general options. While the second section 'db1' is specific to the remote-host 'db1'. Note that we have specified the hostname in the section db1, which is what will be used to connect tothe remote-host, also see how we have overridden the value of config variable 'log'.
@@ -118,19 +118,19 @@ All examples below assume the configuration used is the sample configuration fil
 
 Do a backup of remote-host 'db1' once:
 
-    /usr/local/backup_manager/backup_manager.py
+    /usr/local/xb-mgr/backup_manager.py
 
 Do backup of remote-host 'db1' every 8 hours using CRON:
 
     Add the following line to /etc/crontab:
-    * */8 * * * root /usr/local/backup_manager/backup_manager.py > /dev/null 2>&1
+    * */8 * * * root /usr/local/xb-mgr/backup_manager.py > /dev/null 2>&1
 
 Add a new remote-host 'db2' to be backed up:
 
     Make sure SSH works from manager-host to db2 and vice versa
     Add db2 to the file /etc/ansible/hosts
-    Add the following section to the file /usr/local/backup_manager/conf/backup.conf:
+    Add the following section to the file /usr/local/xb-mgr/conf/backup.conf:
     [db2]
     hostname    = db2
-    log         = /var/log/backup_manager/db2.log
+    log         = /var/log/xb-mgr/db2.log
 
