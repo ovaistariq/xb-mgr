@@ -1,0 +1,147 @@
+#!/bin/bash
+
+is_full_backup=
+is_incremental_backup=
+backup_manager_host=
+remote_backup_directory=
+last_lsn=
+
+mysql_user="root"
+mysql_password="pass"
+
+root_dir="/usr/local/backup_manager"
+tmp_dir="${root_dir}/tmp"
+backup_log="${tmp_dir}/backup-$(date +%Y_%m_%d).log"
+backup_cmd="/usr/bin/innobackupex"
+
+mkdir -p $root_dir
+mkdir -p $tmp_dir
+touch $backup_log
+
+RETURN_MSG="SUCCESS"
+
+# Command line argument processing
+OPT_ARGS=":fid:H:l:"
+while getopts "$OPT_ARGS" opt
+do
+    case $opt in
+	f) is_full_backup=true
+	;;
+	i) is_incremental_backup=true
+        ;;
+        d) remote_backup_directory=$OPTARG
+        ;;
+        H) backup_manager_host=$OPTARG
+        ;;
+        l) last_lsn=$OPTARG
+        ;;
+    esac
+done
+
+function display_error_n_exit() {
+    error_msg=$1     
+    echo "ERROR: $error_msg"
+    exit 1
+}
+
+function exit_on_ssh_error() {
+    if [[ -z $backup_manager_host ]]
+    then 
+        display_error_n_exit "Please provide the remote host to send the backup to" 
+    fi
+  
+    ssh -q $backup_manager_host "exit"
+    if [[ $? != 0 ]]
+    then 
+        display_error_n_exit "Could not SSH to $backup_manager_host" 
+    fi
+}
+
+function exit_on_backup_dir_error() {
+    if [[ -z $remote_backup_directory ]]
+    then 
+        display_error_n_exit "Please provide the directory where backup will be copied to"
+    fi
+
+    ssh -q $backup_manager_host "if [[ -d $remote_backup_directory ]]; then exit 0; else exit 1; fi"
+    if [[ $? != 0 ]]
+    then 
+        display_error_n_exit "Could not find the directory $remote_backup_directory on $backup_manager_host"
+    fi
+}
+
+function do_full_backup() {
+    backup_params="--user=$mysql_user --password='$mysql_password' --compress --stream=xbstream ${tmp_dir} --extra-lsndir=${tmp_dir} --slave-info"
+    backup_file_name="${remote_backup_directory}/backup.xbstream"
+
+    local status=1
+    $backup_cmd $backup_params 2> $backup_log | ssh $backup_manager_host "cat - > $backup_file_name"
+    if [[ $(tail -1 $backup_log | grep -c 'innobackupex: completed OK!') == 1 ]]
+    then
+        scp ${tmp_dir}/xtrabackup_checkpoints $backup_manager_host:${remote_backup_directory}/
+        status=0
+    fi
+
+    return $status
+}
+
+function do_incremental_backup() {
+    backup_params="--user=$mysql_user --password='$mysql_password' --incremental --incremental-lsn=${last_lsn} --compress --stream=xbstream ${tmp_dir} --extra-lsndir=${tmp_dir} --slave-info"
+    backup_file_name="${remote_backup_directory}/backup.xbstream"
+
+    local status=1
+    $backup_cmd $backup_params 2> $backup_log | ssh $backup_manager_host "cat - > $backup_file_name"
+    if [[ $(tail -1 $backup_log | grep -c 'innobackupex: completed OK!') == 1 ]]
+    then
+        scp ${tmp_dir}/xtrabackup_checkpoints $backup_manager_host:${remote_backup_directory}/
+        status=0
+    fi
+
+    return $status
+}
+
+# Both full and incremental types of backups cannot be specified together
+if [[ $is_full_backup == true && $is_incremental_backup == true ]]
+then 
+    display_error_n_exit "You cannot specify both full back and incremental backup"
+fi
+
+# At least one type of backup, full or incremental should be selected
+if [[ -z $is_full_backup && -z $is_incremental_backup ]]
+then 
+    display_error_n_exit "Please specify at least one type of backup"
+fi
+
+# If incremental type of backup is selected and last_lsn is not given, 
+# backup can't proceed
+if [[ $is_incremental_backup == true && -z $last_lsn ]]
+then
+    display_error_n_exit "Incremental type of backup, last_lsn must be provided"
+fi
+
+# Check if SSH access is working
+exit_on_ssh_error
+
+# Check if the backup directory exists on the remote host
+exit_on_backup_dir_error
+
+# Do the actual backup stuff
+if [[ $is_full_backup ]]
+then 
+    do_full_backup
+    if [[ $? != 0 ]]
+    then
+        display_error_n_exit "ERROR: Could not do a full backup, check the log $backup_log"
+    fi
+else
+    do_incremental_backup
+    if [[ $? != 0 ]]
+    then
+        display_error_n_exit "ERROR: Could not do an incremental backup, check the log $backup_log"
+    fi
+fi
+
+# We return success message to the remote command invoker 
+# by printing it out on STDOUT
+echo $RETURN_MSG
+
