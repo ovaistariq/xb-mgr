@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# (c) 2012, Ovais Tariq <ovais.tariq@percona.com>
+# (c) 2012, Ovais Tariq <ovaistariq@gmail.com>
 #
 # This file is part of Xtrabackup Backup Manager
 #
