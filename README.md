@@ -3,7 +3,7 @@ XtraBackup Backup Manager
 
 XtraBackup Backup Manager (xb-mgr) is a backup manager for backing up MySQL data. It uses Percona XtraBackup tool (http://www.percona.com/doc/percona-xtrabackup/intro.html) to backup a MySQL instance. xb-mgr is fairly simple to use and configure. It supports ini style configuration files that can be used to configure backups for remote MySQL instances. xb-mgr supports full backups as well as incremental backups, and is designed to work in the following way. The user specifies which day of the week full backup should be taken, suppose that is Sunday, then every Sunday a full backup is taken once, and every other day incremental backups are taken. xb-mgr also supports multiple backups per day. For example you can setup xb-mgr to run every 8 hour each day via CRON. Note that on the day when full backup is taken, even if you run xb-mgr multiple times, it will still take only a single full backup on that day, and remaining backups will be incremental. xb-mgr also keeps a compressed copy of a fully prepared backup available to make the process of restoring from backups efficient. xb-mgr supports keeping multiple copies of prepared and compressed backups available. This is configurable, for example you can configure to only have 1 prepared backup available, and the latest prepared backup will always be available. xb-mgr also supports logging to a log file as well as sending an email with the log of the backup run to a specified email address.
 
-Running xb-mgr is as simple as executing a single script. Suppose xb-mgr is installed at /usr/local/xb-mgr, then you can run xb-mgr as follows:
+Running xb-mgr is as simple as executing a single script. Suppose xb-mgr is installed at /usr/local/xb-mgr, then you can run xb-mgr as follows:  
 /usr/local/xb-mgr/backup_manager.py
 
 Package Requirements and Dependencies
@@ -12,24 +12,24 @@ xb-mgr is written in Python 2.6 so if you an older version of Python running you
 
 Please make sure that you meet the following requirements on the machine which will be hosting xb-mgr.
 
-In addition to Python 2.6, you would need the following packages installed:
-    * **ansible** - You can read more about installing ansible and its dependencies here: http://ansible.github.com/gettingstarted.html
-    * **percona-xtrabackup** - You must have version >= 2.0 installed for it to work, because xb-mgr uses the new streaming format 'xbstream' introduced in percona-xtrabackup >= 2.0. You must make sure that the tool xbstream is available at location /usr/bin/xbstream and that the tool innobackupex is available at the location /usr/bin/innobackupex. Typical installs of percona-xtrabackup do install the tools xbstream and innobackupex inside /usr/bin.
-    * **qpress** - This package is available here: http://www.quicklz.com/ You must make sure that qpress is available at the location /usr/bin/qpress.
-    * **MySQL-server** - xb-mgr relies on at least the same major version of MySQL server installed, as is the version on the remote MySQL server which will be backed up. You must make sure that mysqld is available at /usr/sbin/mysqld.
-    * **MySQL-client** - xb-mgr relies on the MySQL client package being installed, because it uses the tool mysqlcheck to check the backed up data after taking a backup. You must make sure that mysqlcheck is available at /usr/bin/mysqlcheck.
-    * **MySQL-shared**
-    * **MySQL-shared-compat**
+In addition to Python 2.6, you would need the following packages installed:  
+    * **ansible** - You can read more about installing ansible and its dependencies here: http://ansible.github.com/gettingstarted.html  
+    * **percona-xtrabackup** - You must have version >= 2.0 installed for it to work, because xb-mgr uses the new streaming format 'xbstream' introduced in percona-xtrabackup >= 2.0. You must make sure that the tool xbstream is available at location /usr/bin/xbstream and that the tool innobackupex is available at the location /usr/bin/innobackupex. Typical installs of percona-xtrabackup do install the tools xbstream and innobackupex inside /usr/bin.  
+    * **qpress** - This package is available here: http://www.quicklz.com/ You must make sure that qpress is available at the location /usr/bin/qpress.  
+    * **MySQL-server** - xb-mgr relies on at least the same major version of MySQL server installed, as is the version on the remote MySQL server which will be backed up. You must make sure that mysqld is available at /usr/sbin/mysqld.  
+    * **MySQL-client** - xb-mgr relies on the MySQL client package being installed, because it uses the tool mysqlcheck to check the backed up data after taking a backup. You must make sure that mysqlcheck is available at /usr/bin/mysqlcheck.  
+    * **MySQL-shared**  
+    * **MySQL-shared-compat**  
 
-In addition to the above the remote hosts that will be backed up must have the following packages installed:
-    * **percona-xtrabackup** - You must have version >= 2.0 installed for it to work, because xb-mgr uses the new streaming format 'xbstream' introduced in percona-xtrabackup >= 2.0. You must make sure that the tool xbstream is available at location /usr/bin/xbstream and that the tool innobackupex is available at the location /usr/bin/innobackupex. Typical installs of percona-xtrabackup do install the tools xbstream and innobackupex inside /usr/bin.
-    * **qpress** - This package is available here: http://www.quicklz.com/ You must make sure that qpress is available at the location /usr/bin/qpress.
+In addition to the above the remote hosts that will be backed up must have the following packages installed:  
+    * **percona-xtrabackup** - You must have version >= 2.0 installed for it to work, because xb-mgr uses the new streaming format 'xbstream' introduced in percona-xtrabackup >= 2.0. You must make sure that the tool xbstream is available at location /usr/bin/xbstream and that the tool innobackupex is available at the location /usr/bin/innobackupex. Typical installs of percona-xtrabackup do install the tools xbstream and innobackupex inside /usr/bin.  
+    * **qpress** - This package is available here: http://www.quicklz.com/ You must make sure that qpress is available at the location /usr/bin/qpress.  
 
 You must have noticed that some executatbles used by xb-mgr are required to be at specific location. I intend on removing this restriction in a future version.
 
-Before continuing on with the rest of the sections, let me introduce two keywords that I will be using in this section:
-    * **manager-host** - This is the machine that is hosting xb-mgr
-    * **remote-host** - This is the remote machine running the MySQL server that is to be backed up
+Before continuing on with the rest of the sections, let me introduce two keywords that I will be using in this section:  
+    * **manager-host** - This is the machine that is hosting xb-mgr  
+    * **remote-host** - This is the remote machine running the MySQL server that is to be backed up  
 
 SSH Authentication and Authorization
 ====================================
@@ -37,11 +37,11 @@ For xb-mgr to run you must make sure that manager-host can connect to remote-hos
 
 Configuration
 =============
-xb-mgr uses ini-style configuration files. The configuration file is located in the conf directory inside the xb-mgr directory. So if you have xb-mgr at location /usr/local/backup-manager, the configuration file will be available at /usr/local/backup-manager/conf/backup.conf. 
+xb-mgr uses ini-style configuration files. The configuration file is located in the conf directory inside the xb-mgr directory. So if you have xb-mgr at location /usr/local/xb-mgr, the configuration file will be available at /usr/local/xb-mgr/conf/backup.conf. 
 
 The xb-mgr configuration file has a section called 'default' which has general options pertaining to xb-mgr. The configuration file also has remote-host specific section, which is called after the hostname. Moreover, the options defined in remote-host section override the options defined in the default section.
 
-xb-mgr supports the following general configuration options that can be specified in the default section:
+xb-mgr supports the following general configuration options that can be specified in the default section:  
     * mysql_user - This is the MySQL user that will be used by xb-mgr during the backup process. The user must exist on the remote-host, and should have the following privileges:
 	* RELOAD
 	* LOCK TABLES
