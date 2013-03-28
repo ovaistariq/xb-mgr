@@ -134,4 +134,17 @@ Add a new remote-host 'db2' to be backed up:
     [db2]
     hostname    = db2
     log         = /var/log/xb-mgr/db2.log
+    pid         = /var/run/xb-mgr-db2.pid
 
+Backup only a single host 'db2':
+
+    Make sure SSH works from manager-host to db2 and vice versa
+    Add db2 to the file /etc/ansible/hosts
+    Add the following section to the file /usr/local/xb-mgr/conf/backup.conf:
+    [db2]
+    hostname    = db2
+    log         = /var/log/xb-mgr/db2.log
+    pid         = /var/run/xb-mgr-db2.pid
+
+    And execute the following:
+    /usr/local/xb-mgr/backup_single_host.py --host db2
