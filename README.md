@@ -13,23 +13,23 @@ xb-mgr is written in Python 2.6 so if you an older version of Python running you
 Please make sure that you meet the following requirements on the machine which will be hosting xb-mgr.
 
 In addition to Python 2.6, you would need the following packages installed:  
-    + **ansible** - You can read more about installing ansible and its dependencies here: http://ansible.github.com/gettingstarted.html  
-    + **percona-xtrabackup** - You must have version >= 2.0 installed for it to work, because xb-mgr uses the new streaming format 'xbstream' introduced in percona-xtrabackup >= 2.0. You must make sure that the tool xbstream is available at location /usr/bin/xbstream and that the tool innobackupex is available at the location /usr/bin/innobackupex. Typical installs of percona-xtrabackup do install the tools xbstream and innobackupex inside /usr/bin.  
-    + **qpress** - This package is available here: http://www.quicklz.com/ You must make sure that qpress is available at the location /usr/bin/qpress.  
-    + **MySQL-server** - xb-mgr relies on at least the same major version of MySQL server installed, as is the version on the remote MySQL server which will be backed up. You must make sure that mysqld is available at /usr/sbin/mysqld.  
-    + **MySQL-client** - xb-mgr relies on the MySQL client package being installed, because it uses the tool mysqlcheck to check the backed up data after taking a backup. You must make sure that mysqlcheck is available at /usr/bin/mysqlcheck.  
-    + **MySQL-shared**  
-    + **MySQL-shared-compat**  
++ **ansible** - You can read more about installing ansible and its dependencies here: http://ansible.github.com/gettingstarted.html  
++ **percona-xtrabackup** - You must have version >= 2.0 installed for it to work, because xb-mgr uses the new streaming format 'xbstream' introduced in percona-xtrabackup >= 2.0. You must make sure that the tool xbstream is available at location /usr/bin/xbstream and that the tool innobackupex is available at the location /usr/bin/innobackupex. Typical installs of percona-xtrabackup do install the tools xbstream and innobackupex inside /usr/bin.  
++ **qpress** - This package is available here: http://www.quicklz.com/ You must make sure that qpress is available at the location /usr/bin/qpress.  
++ **MySQL-server** - xb-mgr relies on at least the same major version of MySQL server installed, as is the version on the remote MySQL server which will be backed up. You must make sure that mysqld is available at /usr/sbin/mysqld.  
++ **MySQL-client** - xb-mgr relies on the MySQL client package being installed, because it uses the tool mysqlcheck to check the backed up data after taking a backup. You must make sure that mysqlcheck is available at /usr/bin/mysqlcheck.  
++ **MySQL-shared**  
++ **MySQL-shared-compat**  
 
 In addition to the above the remote hosts that will be backed up must have the following packages installed:  
-    + **percona-xtrabackup** - You must have version >= 2.0 installed for it to work, because xb-mgr uses the new streaming format 'xbstream' introduced in percona-xtrabackup >= 2.0. You must make sure that the tool xbstream is available at location /usr/bin/xbstream and that the tool innobackupex is available at the location /usr/bin/innobackupex. Typical installs of percona-xtrabackup do install the tools xbstream and innobackupex inside /usr/bin.  
-    + **qpress** - This package is available here: http://www.quicklz.com/ You must make sure that qpress is available at the location /usr/bin/qpress.  
++ **percona-xtrabackup** - You must have version >= 2.0 installed for it to work, because xb-mgr uses the new streaming format 'xbstream' introduced in percona-xtrabackup >= 2.0. You must make sure that the tool xbstream is available at location /usr/bin/xbstream and that the tool innobackupex is available at the location /usr/bin/innobackupex. Typical installs of percona-xtrabackup do install the tools xbstream and innobackupex inside /usr/bin.  
++ **qpress** - This package is available here: http://www.quicklz.com/ You must make sure that qpress is available at the location /usr/bin/qpress.  
 
 You must have noticed that some executatbles used by xb-mgr are required to be at specific location. I intend on removing this restriction in a future version.
 
 Before continuing on with the rest of the sections, let me introduce two keywords that I will be using in this section:  
-    + **manager-host** - This is the machine that is hosting xb-mgr  
-    + **remote-host** - This is the remote machine running the MySQL server that is to be backed up  
++ **manager-host** - This is the machine that is hosting xb-mgr  
++ **remote-host** - This is the remote machine running the MySQL server that is to be backed up  
 
 SSH Authentication and Authorization
 ====================================
@@ -60,7 +60,7 @@ xb-mgr supports the following general configuration options that can be specifie
 + error_email_recipient - A comma-separated list of email addresses to which email will be sent after xb-mgr run. This can also be a single email address.  
 
 All the options defined above can also be specified in the remote-host specific section, and they will override the values of options defined in the default section. The remote-host specific section has one extra option:  
-    + hostname - The hostname of the remote-host that is to be backed up. Currently xb-mgr cannot work with IP addresses of remote-host, so you must specify the hostname and make sure that the hostname resolves either via /etc/hosts file or via DNS resolution  
++ hostname - The hostname of the remote-host that is to be backed up. Currently xb-mgr cannot work with IP addresses of remote-host, so you must specify the hostname and make sure that the hostname resolves either via /etc/hosts file or via DNS resolution  
 
 Note that you must have separate section for each remote-host. Let me show you an example configuration file:  
 
@@ -83,6 +83,7 @@ Note that you must have separate section for each remote-host. Let me show you a
     [db1]
     hostname    = db1
     log         = /var/log/xb-mgr/db1.log
+    pid         = /var/log/xb-mgr-db1.pid
 ---
 
 Note that we have two sections above, one is the default section which consists of general options. While the second section 'db1' is specific to the remote-host 'db1'. Note that we have specified the hostname in the section db1, which is what will be used to connect tothe remote-host, also see how we have overridden the value of config variable 'log'.
