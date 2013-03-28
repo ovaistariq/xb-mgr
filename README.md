@@ -13,23 +13,23 @@ xb-mgr is written in Python 2.6 so if you an older version of Python running you
 Please make sure that you meet the following requirements on the machine which will be hosting xb-mgr.
 
 In addition to Python 2.6, you would need the following packages installed:  
-    * **ansible** - You can read more about installing ansible and its dependencies here: http://ansible.github.com/gettingstarted.html  
-    * **percona-xtrabackup** - You must have version >= 2.0 installed for it to work, because xb-mgr uses the new streaming format 'xbstream' introduced in percona-xtrabackup >= 2.0. You must make sure that the tool xbstream is available at location /usr/bin/xbstream and that the tool innobackupex is available at the location /usr/bin/innobackupex. Typical installs of percona-xtrabackup do install the tools xbstream and innobackupex inside /usr/bin.  
-    * **qpress** - This package is available here: http://www.quicklz.com/ You must make sure that qpress is available at the location /usr/bin/qpress.  
-    * **MySQL-server** - xb-mgr relies on at least the same major version of MySQL server installed, as is the version on the remote MySQL server which will be backed up. You must make sure that mysqld is available at /usr/sbin/mysqld.  
-    * **MySQL-client** - xb-mgr relies on the MySQL client package being installed, because it uses the tool mysqlcheck to check the backed up data after taking a backup. You must make sure that mysqlcheck is available at /usr/bin/mysqlcheck.  
-    * **MySQL-shared**  
-    * **MySQL-shared-compat**  
+    + **ansible** - You can read more about installing ansible and its dependencies here: http://ansible.github.com/gettingstarted.html  
+    + **percona-xtrabackup** - You must have version >= 2.0 installed for it to work, because xb-mgr uses the new streaming format 'xbstream' introduced in percona-xtrabackup >= 2.0. You must make sure that the tool xbstream is available at location /usr/bin/xbstream and that the tool innobackupex is available at the location /usr/bin/innobackupex. Typical installs of percona-xtrabackup do install the tools xbstream and innobackupex inside /usr/bin.  
+    + **qpress** - This package is available here: http://www.quicklz.com/ You must make sure that qpress is available at the location /usr/bin/qpress.  
+    + **MySQL-server** - xb-mgr relies on at least the same major version of MySQL server installed, as is the version on the remote MySQL server which will be backed up. You must make sure that mysqld is available at /usr/sbin/mysqld.  
+    + **MySQL-client** - xb-mgr relies on the MySQL client package being installed, because it uses the tool mysqlcheck to check the backed up data after taking a backup. You must make sure that mysqlcheck is available at /usr/bin/mysqlcheck.  
+    + **MySQL-shared**  
+    + **MySQL-shared-compat**  
 
 In addition to the above the remote hosts that will be backed up must have the following packages installed:  
-    * **percona-xtrabackup** - You must have version >= 2.0 installed for it to work, because xb-mgr uses the new streaming format 'xbstream' introduced in percona-xtrabackup >= 2.0. You must make sure that the tool xbstream is available at location /usr/bin/xbstream and that the tool innobackupex is available at the location /usr/bin/innobackupex. Typical installs of percona-xtrabackup do install the tools xbstream and innobackupex inside /usr/bin.  
-    * **qpress** - This package is available here: http://www.quicklz.com/ You must make sure that qpress is available at the location /usr/bin/qpress.  
+    + **percona-xtrabackup** - You must have version >= 2.0 installed for it to work, because xb-mgr uses the new streaming format 'xbstream' introduced in percona-xtrabackup >= 2.0. You must make sure that the tool xbstream is available at location /usr/bin/xbstream and that the tool innobackupex is available at the location /usr/bin/innobackupex. Typical installs of percona-xtrabackup do install the tools xbstream and innobackupex inside /usr/bin.  
+    + **qpress** - This package is available here: http://www.quicklz.com/ You must make sure that qpress is available at the location /usr/bin/qpress.  
 
 You must have noticed that some executatbles used by xb-mgr are required to be at specific location. I intend on removing this restriction in a future version.
 
 Before continuing on with the rest of the sections, let me introduce two keywords that I will be using in this section:  
-    * **manager-host** - This is the machine that is hosting xb-mgr  
-    * **remote-host** - This is the remote machine running the MySQL server that is to be backed up  
+    + **manager-host** - This is the machine that is hosting xb-mgr  
+    + **remote-host** - This is the remote machine running the MySQL server that is to be backed up  
 
 SSH Authentication and Authorization
 ====================================
@@ -42,48 +42,48 @@ xb-mgr uses ini-style configuration files. The configuration file is located in 
 The xb-mgr configuration file has a section called 'default' which has general options pertaining to xb-mgr. The configuration file also has remote-host specific section, which is called after the hostname. Moreover, the options defined in remote-host section override the options defined in the default section.
 
 xb-mgr supports the following general configuration options that can be specified in the default section:  
-    * mysql_user - This is the MySQL user that will be used by xb-mgr during the backup process. The user must exist on the remote-host, and should have the following privileges:
-	* RELOAD
-	* LOCK TABLES
-	* REPLICATION CLIENT
-	* SUPER
-    * mysql_password - This is the password for the MySQL user
-    * ssh_user - This is the SSH user that will be used to connect from manager-host to remote-host and from remote-host to manager-host. This user must be able to perform operations on the MySQL datadir at remote-host, and must also be able to perform operations on the directory on manager-host where backups will be stored
-    * backup_manager_host - The IP of the manager-host
-    * remote_backup_cmd - xb-mgr installs a helper script on the remote host to aid in the backup process. This config option specifies the location where this helper script should be installed
-    * root_dir - The root directory of xb-mgr install, for example if xb-mgr is installed in /usr/local/backup-manager, then the root_dir will be /usr/local/backup-manager
-    * backup_dir - The root directory where backups taken by xb-mgr are stored. Within this directory xb-mgr creates separate directories for each remote-host to be backed up, see the section **Backup Directory Structure** for details
-    * log - The path to the log file where xb-mgr will write all messages generated during the backup run
-    * pid - The path to the file where xb-mgr will write its pid
-    * retain_days - The number of days upto which the backups must be retained. xb-mgr makes sure that you can always go back upto retain_days days in the past, sometimes this would mean storing backups that are more than retain_days old, this is because incremental backups always need full backup to be able to be restored upto the day when the incremental backup was taken. Note that backups are removed only when the current run of xb-mgr was successfull
-    * retain_num_ready_backups - The number of prepared-compressed backups that must be retained. After every successful backup run xb-mgr creates a prepared-compressed backup that is read to be restored. xb-mgr keeps at most retain_num_ready_backups copies of prepared-compressed backup. When the number of prepared-compressed backups exceeds the value of retain_num_ready_backups, oldest prepared-compressed backups are removed. Note that the removal of backups only takes place when the current run of xb-mgr was successfull, this is to make sure that the last prepared-compressed backup is always available
-    * error_email_recipient - A comma-separated list of email addresses to which email will be sent after xb-mgr run. This can also be a single email address.
+    + mysql_user - This is the MySQL user that will be used by xb-mgr during the backup process. The user must exist on the remote-host, and should have the following privileges:  
+	+ RELOAD  
+	+ LOCK TABLES  
+	+ REPLICATION CLIENT  
+	+ SUPER  
+    + mysql_password - This is the password for the MySQL user  
+    + ssh_user - This is the SSH user that will be used to connect from manager-host to remote-host and from remote-host to manager-host. This user must be able to perform operations on the MySQL datadir at remote-host, and must also be able to perform operations on the directory on manager-host where backups will be stored  
+    + backup_manager_host - The IP of the manager-host  
+    + remote_backup_cmd - xb-mgr installs a helper script on the remote host to aid in the backup process. This config option specifies the location where this helper script should be installed  
+    + root_dir - The root directory of xb-mgr install, for example if xb-mgr is installed in /usr/local/backup-manager, then the root_dir will be /usr/local/backup-manager  
+    + backup_dir - The root directory where backups taken by xb-mgr are stored. Within this directory xb-mgr creates separate directories for each remote-host to be backed up, see the section **Backup Directory Structure** for details  
+    + log - The path to the log file where xb-mgr will write all messages generated during the backup run  
+    + pid - The path to the file where xb-mgr will write its pid  
+    + retain_days - The number of days upto which the backups must be retained. xb-mgr makes sure that you can always go back upto retain_days days in the past, sometimes this would mean storing backups that are more than retain_days old, this is because incremental backups always need full backup to be able to be restored upto the day when the incremental backup was taken. Note that backups are removed only when the current run of xb-mgr was successfull  
+    + retain_num_ready_backups - The number of prepared-compressed backups that must be retained. After every successful backup run xb-mgr creates a prepared-compressed backup that is read to be restored. xb-mgr keeps at most retain_num_ready_backups copies of prepared-compressed backup. When the number of prepared-compressed backups exceeds the value of retain_num_ready_backups, oldest prepared-compressed backups are removed. Note that the removal of backups only takes place when the current run of xb-mgr was successfull, this is to make sure that the last prepared-compressed backup is always available  
+    + error_email_recipient - A comma-separated list of email addresses to which email will be sent after xb-mgr run. This can also be a single email address.  
 
-All the options defined above can also be specified in the remote-host specific section, and they will override the values of options defined in the default section. The remote-host specific section has one extra option:
-    * hostname - The hostname of the remote-host that is to be backed up. Currently xb-mgr cannot work with IP addresses of remote-host, so you must specify the hostname and make sure that the hostname resolves either via /etc/hosts file or via DNS resolution
+All the options defined above can also be specified in the remote-host specific section, and they will override the values of options defined in the default section. The remote-host specific section has one extra option:  
+    + hostname - The hostname of the remote-host that is to be backed up. Currently xb-mgr cannot work with IP addresses of remote-host, so you must specify the hostname and make sure that the hostname resolves either via /etc/hosts file or via DNS resolution  
 
-Note that you must have separate section for each remote-host. Let me show you an example configuration file:
+Note that you must have separate section for each remote-host. Let me show you an example configuration file:  
 
---
-[default]
-mysql_user          = backup_man
-mysql_password      = some_pass
-ssh_user            = root
-backup_manager_host = root@10.10.1.1
-remote_backup_cmd   = /usr/local/xb-mgr/bin/backup_local
-full_backup_day     = Sunday
-root_dir            = /usr/local/xb-mgr
-backup_dir          = /backup
-log                 = /var/log/xb-mgr/backup_manager.log
-pid                 = /var/run/xb-mgr.pid
-retain_days         = 7
-retain_num_ready_backups = 1
-error_email_recipient = ovaistariq@gmail.com
+---
+    [default]
+    mysql_user          = backup_man
+    mysql_password      = some_pass
+    ssh_user            = root
+    backup_manager_host = root@10.10.1.1
+    remote_backup_cmd   = /usr/local/xb-mgr/bin/backup_local
+    full_backup_day     = Sunday
+    root_dir            = /usr/local/xb-mgr
+    backup_dir          = /backup
+    log                 = /var/log/xb-mgr/backup_manager.log
+    pid                 = /var/run/xb-mgr.pid
+    retain_days         = 7
+    retain_num_ready_backups = 1
+    error_email_recipient = ovaistariq@gmail.com
 
-[db1]
-hostname    = db1
-log         = /var/log/xb-mgr/db1.log
---
+    [db1]
+    hostname    = db1
+    log         = /var/log/xb-mgr/db1.log
+---
 
 Note that we have two sections above, one is the default section which consists of general options. While the second section 'db1' is specific to the remote-host 'db1'. Note that we have specified the hostname in the section db1, which is what will be used to connect tothe remote-host, also see how we have overridden the value of config variable 'log'.
 
