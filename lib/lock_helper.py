@@ -20,8 +20,8 @@ import fcntl
 from config_helper import Config_helper
 
 class Lock_helper(object):
-    def __init__(self):
-	config_helper = Config_helper(host=None)
+    def __init__(self, host=None):
+	config_helper = Config_helper(host=host)
 	self._root_dir = config_helper.get_root_dir()
 	self._pid_file = config_helper.get_pid_file()
 	self._pid = os.getpid()
