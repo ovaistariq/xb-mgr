@@ -43,10 +43,10 @@ The xb-mgr configuration file has a section called 'default' which has general o
 
 xb-mgr supports the following general configuration options that can be specified in the default section:  
     + mysql_user - This is the MySQL user that will be used by xb-mgr during the backup process. The user must exist on the remote-host, and should have the following privileges:  
-	-   RELOAD  
-	-   LOCK TABLES  
-	-   REPLICATION CLIENT  
-	-   SUPER  
+   -    RELOAD  
+   -    LOCK TABLES  
+   -    REPLICATION CLIENT  
+   -    SUPER  
     + mysql_password - This is the password for the MySQL user  
     + ssh_user - This is the SSH user that will be used to connect from manager-host to remote-host and from remote-host to manager-host. This user must be able to perform operations on the MySQL datadir at remote-host, and must also be able to perform operations on the directory on manager-host where backups will be stored  
     + backup_manager_host - The IP of the manager-host  
