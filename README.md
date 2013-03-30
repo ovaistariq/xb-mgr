@@ -49,6 +49,7 @@ xb-mgr supports the following general configuration options that can be specifie
    -    SUPER  
 + mysql_password - This is the password for the MySQL user  
 + ssh_user - This is the SSH user that will be used to connect from manager-host to remote-host and from remote-host to manager-host. This user must be able to perform operations on the MySQL datadir at remote-host, and must also be able to perform operations on the directory on manager-host where backups will be stored  
++ ssh_private_key_file - This is the path to the SSH private key file that will be used to connect the remote-host to/from manager-host
 + backup_manager_host - The IP of the manager-host  
 + remote_backup_cmd - xb-mgr installs a helper script on the remote host to aid in the backup process. This config option specifies the location where this helper script should be installed  
 + root_dir - The root directory of xb-mgr install, for example if xb-mgr is installed in /usr/local/backup-manager, then the root_dir will be /usr/local/backup-manager  
@@ -69,6 +70,7 @@ Note that you must have separate section for each remote-host. Let me show you a
     mysql_user          = backup_man
     mysql_password      = some_pass
     ssh_user            = root
+    ssh_private_key_file = /usr/local/xb-mgr/conf/id_rsa/key.pk
     backup_manager_host = root@10.10.1.1
     remote_backup_cmd   = /usr/local/xb-mgr/bin/backup_local
     full_backup_day     = Sunday

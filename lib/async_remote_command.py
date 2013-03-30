@@ -28,6 +28,7 @@ class Async_remote_command(object):
         self._COMMAND_SUCCESS_OUTPUT = "SUCCESS"
 
 	config_helper = Config_helper(host=host)
+        self._private_key_file = config_helper.get_private_key_file()
 
     def setup_remote_command(self):
         # Setup remote command directory first
@@ -35,7 +36,8 @@ class Async_remote_command(object):
         ansible_cmd_args = "state=directory path=%s" % command_dirname
         runner_obj = ansible.runner.Runner(pattern=self._host,
                                             module_name="file", 
-                                            module_args=ansible_cmd_args)
+                                            module_args=ansible_cmd_args,
+                                            private_key_file=self._private_key_file)
         results = runner_obj.run()
         if self.validate_host_connection(remote_cmd_result=results) == False:
             print "Error connecting to", self._host
@@ -49,7 +51,8 @@ class Async_remote_command(object):
         ansible_cmd_args = "src=%s dest=%s mode=0700" % (self._command, self._command)
         runner_obj = ansible.runner.Runner(pattern=self._host,
                                             module_name="copy",
-                                            module_args=ansible_cmd_args)
+                                            module_args=ansible_cmd_args,
+                                            private_key_file=self._private_key_file)
         results = runner_obj.run()
         if self.validate_host_connection(remote_cmd_result=results) == False:
             print "Error connecting to", self._host
@@ -66,7 +69,8 @@ class Async_remote_command(object):
         runner_obj = ansible.runner.Runner(pattern=self._host, 
                                             module_name="command", 
                                             module_args=ansible_cmd_args, 
-                                            background=max_run_seconds)
+                                            background=max_run_seconds,
+                                            private_key_file=self._private_key_file)
         results = runner_obj.run()
         if self.validate_host_connection(remote_cmd_result=results) == False:
             print "Error connecting to", self._host
@@ -82,7 +86,8 @@ class Async_remote_command(object):
     def poll_command_result(self, poll_seconds=10):
         poller_obj = ansible.runner.Runner(pattern=self._host, 
 					    module_name="async_status", 
-					    module_args="jid="+self._job_id)
+					    module_args="jid="+self._job_id,
+                                            private_key_file=self._private_key_file)
 
         while True:
             results = poller_obj.run()
