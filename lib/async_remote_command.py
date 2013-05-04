@@ -50,7 +50,7 @@ class Async_remote_command(object):
             return False
 
         # Now copy the remote command to the host
-        ansible_cmd_args = "src=%s dest=%s mode=0700" % (self._command, self._command)
+        ansible_cmd_args = "src=%s dest=%s mode=0755" % (self._command, self._command)
         runner_obj = ansible.runner.Runner(pattern=self._host,
                                             module_name="copy",
                                             module_args=ansible_cmd_args,
