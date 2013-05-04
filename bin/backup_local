@@ -28,7 +28,7 @@ mysql_password=""
 
 root_dir=$(cd $(dirname $0)/..; pwd)
 tmp_dir="${root_dir}/tmp"
-backup_log="${tmp_dir}/backup-$(date +%Y_%m_%d).log"
+backup_log="${tmp_dir}/backup-$(date +%Y_%m_%d_%H_%M_%S).log"
 backup_cmd="/usr/bin/innobackupex"
 
 mkdir -p $root_dir
