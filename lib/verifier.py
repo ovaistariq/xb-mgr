@@ -38,6 +38,8 @@ class Verifier(object):
         self._log_helper = logger
         config_helper = Config_helper(host=self._host)
 
+        self._ssh_user = config_helper.get_ssh_user()
+
         self._backup_directory = os.path.join(config_helper.get_backup_dir(),
                                             self._host)
 
@@ -63,11 +65,11 @@ class Verifier(object):
             return False
 
         # Set correct dir permissions
-        self._log_helper.info_message("Setting correct permissions on the "
-                                    "verification directory")
-        if not self.set_correct_dir_permissions():
-            self._log_helper.error_message("Failed to set permissions")
-            return False
+        #self._log_helper.info_message("Setting correct permissions on the "
+        #                            "verification directory")
+        #if not self.set_correct_dir_permissions():
+        #    self._log_helper.error_message("Failed to set permissions")
+        #    return False
 
         # Start mysqld and check tables
         if not self.verify_low_level():
@@ -111,7 +113,7 @@ class Verifier(object):
         mysqld_exited = False
 
         cmd = [Verifier.MYSQLD_CMD, 
-                "--user=mysql", 
+                "--user=%s" % self._ssh_user, 
                 "--skip-grant-tables",
                 "--skip-networking", 
                 "--log-error=%s" % self._error_log,
