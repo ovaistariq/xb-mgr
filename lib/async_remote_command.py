@@ -28,6 +28,7 @@ class Async_remote_command(object):
         self._COMMAND_SUCCESS_OUTPUT = "SUCCESS"
 
 	config_helper = Config_helper(host=host)
+        self._ssh_user = config_helper.get_ssh_user()
         self._private_key_file = config_helper.get_private_key_file()
 
     def setup_remote_command(self):
@@ -37,6 +38,7 @@ class Async_remote_command(object):
         runner_obj = ansible.runner.Runner(pattern=self._host,
                                             module_name="file", 
                                             module_args=ansible_cmd_args,
+                                            remote_user=self._ssh_user,
                                             private_key_file=self._private_key_file)
         results = runner_obj.run()
         if self.validate_host_connection(remote_cmd_result=results) == False:
@@ -52,6 +54,7 @@ class Async_remote_command(object):
         runner_obj = ansible.runner.Runner(pattern=self._host,
                                             module_name="copy",
                                             module_args=ansible_cmd_args,
+                                            remote_user=self._ssh_user,
                                             private_key_file=self._private_key_file)
         results = runner_obj.run()
         if self.validate_host_connection(remote_cmd_result=results) == False:
@@ -70,6 +73,7 @@ class Async_remote_command(object):
                                             module_name="command", 
                                             module_args=ansible_cmd_args, 
                                             background=max_run_seconds,
+                                            remote_user=self._ssh_user,
                                             private_key_file=self._private_key_file)
         results = runner_obj.run()
         if self.validate_host_connection(remote_cmd_result=results) == False:
@@ -87,6 +91,7 @@ class Async_remote_command(object):
         poller_obj = ansible.runner.Runner(pattern=self._host, 
 					    module_name="async_status", 
 					    module_args="jid="+self._job_id,
+                                            remote_user=self._ssh_user,
                                             private_key_file=self._private_key_file)
 
         while True:

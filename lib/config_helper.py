@@ -73,6 +73,9 @@ class Config_helper(object):
     def get_retain_num_ready_backups(self):
 	return self.get_param_value(param_name='retain_num_ready_backups')
 
+    def get_ssh_user(self):
+        return self.get_param_value(param_name='ssh_user')
+
     def get_private_key_file(self):
         return self.get_param_value(param_name='ssh_private_key_file')
 
