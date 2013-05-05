@@ -20,7 +20,7 @@ from email.mime.text import MIMEText
 
 class Email_helper(object):
     SMTP_HOST = "localhost"
-    SENDER = "backup_manager@db-backup.nor1.com"
+    SENDER = "backup_manager@backup.com"
 
     def __init__(self):
         self._email_sender = smtplib.SMTP(Email_helper.SMTP_HOST)
