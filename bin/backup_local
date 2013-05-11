@@ -23,13 +23,11 @@ backup_manager_host=
 remote_backup_directory=
 last_lsn=
 
-mysql_user="root"
-mysql_password=""
-
 root_dir=$(cd $(dirname $0)/..; pwd)
 tmp_dir="${root_dir}/tmp"
 backup_log="${tmp_dir}/backup-$(date +%Y_%m_%d_%H_%M_%S).log"
 backup_cmd="/usr/bin/innobackupex"
+xtrbackup_conf=${root_dir}/conf/xtrabackup.conf
 
 mkdir -p $root_dir
 mkdir -p $tmp_dir
@@ -88,7 +86,7 @@ function exit_on_backup_dir_error() {
 }
 
 function do_full_backup() {
-    backup_params="--user=$mysql_user --password='$mysql_password' --compress --stream=xbstream ${tmp_dir} --extra-lsndir=${tmp_dir} --slave-info"
+    backup_params="--defaults-extra-file=${xtrbackup_conf} --compress --stream=xbstream ${tmp_dir} --extra-lsndir=${tmp_dir} --slave-info"
     backup_file_name="${remote_backup_directory}/backup.xbstream"
 
     local status=1
@@ -103,7 +101,7 @@ function do_full_backup() {
 }
 
 function do_incremental_backup() {
-    backup_params="--user=$mysql_user --password='$mysql_password' --incremental --incremental-lsn=${last_lsn} --compress --stream=xbstream ${tmp_dir} --extra-lsndir=${tmp_dir} --slave-info"
+    backup_params="--defaults-extra-file=${xtrbackup_conf} --incremental --incremental-lsn=${last_lsn} --compress --stream=xbstream ${tmp_dir} --extra-lsndir=${tmp_dir} --slave-info"
     backup_file_name="${remote_backup_directory}/backup.xbstream"
 
     local status=1
