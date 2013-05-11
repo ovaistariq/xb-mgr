@@ -33,9 +33,6 @@ class Backup(object):
 
         config_helper = Config_helper(host=self._host)
 
-        self._mysql_user = config_helper.get_mysql_user()
-        self._mysql_password = config_helper.get_mysql_password()
-
         self._backup_manager_host = config_helper.get_backup_manager_host()
         self._full_backup_day = config_helper.get_full_backup_day()
 

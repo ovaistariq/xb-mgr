@@ -55,12 +55,6 @@ class Config_helper(object):
     def get_full_backup_day(self):
         return self.get_param_value(param_name='full_backup_day')
 
-    def get_mysql_user(self):
-        return self.get_param_value(param_name='mysql_user')
-
-    def get_mysql_password(self):
-        return self.get_param_value(param_name='mysql_password')
-
     def get_log_file(self):
         return self.get_param_value(param_name='log')
 
