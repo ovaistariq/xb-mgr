@@ -113,6 +113,7 @@ class Verifier(object):
         mysqld_exited = False
 
         cmd = [Verifier.MYSQLD_CMD, 
+                "--no-defaults",
                 "--user=%s" % self._ssh_user, 
                 "--skip-grant-tables",
                 "--skip-networking", 
@@ -120,9 +121,9 @@ class Verifier(object):
                 "--pid=%s" % self._pid_file, 
                 "--socket=%s" % self._socket_file,
                 "--datadir=%s" % self._verify_directory,
-                "--log-slow-queries=0",
+                "--slow-query-log=0",
                 "--skip-slave-start",
-                "--log=0",
+                "--general-log=0",
                 "--skip-log-warnings"]
 
         mysqld_extra_params = self.get_mysql_params()
