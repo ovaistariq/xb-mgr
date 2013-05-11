@@ -40,7 +40,7 @@ Thumbs.db
 
 # Configuration file #
 ######################
-backup.conf
+*.conf
 
 # Key files #
 #############
