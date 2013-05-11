@@ -96,7 +96,7 @@ There is also another config file needed on the remote hosts that need to be bac
 Let me show you an example xtrabackup.conf file:
 
 ---
-    [xtrabackup]
+    [client]
     user        = root
     password    = some_pass
 ---
