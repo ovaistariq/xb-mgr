@@ -37,17 +37,13 @@ For xb-mgr to run you must make sure that manager-host can connect to remote-hos
 
 Configuration
 =============
-xb-mgr uses ini-style configuration files. The configuration file is located in the conf directory inside the xb-mgr directory. So if you have xb-mgr at location /usr/local/xb-mgr, the configuration file will be available at /usr/local/xb-mgr/conf/backup.conf. 
+xb-mgr uses ini-style configuration files. 
+
+The main configuration file is located in the conf directory inside the xb-mgr directory. So if you have xb-mgr at location /usr/local/xb-mgr, the configuration file will be available at /usr/local/xb-mgr/conf/backup.conf. 
 
 The xb-mgr configuration file has a section called 'default' which has general options pertaining to xb-mgr. The configuration file also has remote-host specific section, which is called after the hostname. Moreover, the options defined in remote-host section override the options defined in the default section.
 
 xb-mgr supports the following general configuration options that can be specified in the default section:  
-+ mysql_user - This is the MySQL user that will be used by xb-mgr during the backup process. The user must exist on the remote-host, and should have the following privileges:  
-   -    RELOAD  
-   -    LOCK TABLES  
-   -    REPLICATION CLIENT  
-   -    SUPER  
-+ mysql_password - This is the password for the MySQL user  
 + ssh_user - This is the SSH user that will be used to connect from manager-host to remote-host and from remote-host to manager-host. This user must be able to perform operations on the MySQL datadir at remote-host, and must also be able to perform operations on the directory on manager-host where backups will be stored  
 + ssh_private_key_file - This is the path to the SSH private key file that will be used to connect the remote-host to/from manager-host
 + backup_manager_host - The IP of the manager-host  
@@ -67,8 +63,6 @@ Note that you must have separate section for each remote-host. Let me show you a
 
 ---
     [default]
-    mysql_user          = backup_man
-    mysql_password      = some_pass
     ssh_user            = root
     ssh_private_key_file = /usr/local/xb-mgr/conf/id_rsa/key.pk
     backup_manager_host = root@10.10.1.1
@@ -89,6 +83,23 @@ Note that you must have separate section for each remote-host. Let me show you a
 ---
 
 Note that we have two sections above, one is the default section which consists of general options. While the second section 'db1' is specific to the remote-host 'db1'. Note that we have specified the hostname in the section db1, which is what will be used to connect tothe remote-host, also see how we have overridden the value of config variable 'log'.
+
+There is also another config file needed on the remote hosts that need to be backed up, this file is named xtrabackup.conf and must be located in the conf directory inside the xb-mgr directory on the remote hosts. So if you have xb-mgr at location /usr/local/xb-mgr, the configuration file will be available at /usr/local/xb-mgr/conf/xtrabackup.conf. 
+
++ mysql_user - This is the MySQL user that will be used by xb-mgr during the backup process. The user must exist on the remote-host, and should have the following privileges:  
+   -    RELOAD  
+   -    LOCK TABLES  
+   -    REPLICATION CLIENT  
+   -    SUPER  
++ mysql_password - This is the password for the MySQL user
+
+Let me show you an example xtrabackup.conf file:
+
+---
+    [xtrabackup]
+    user        = root
+    password    = some_pass
+---
 
 Remote hosts and Ansible Configuration
 ======================================
